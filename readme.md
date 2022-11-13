@@ -4,7 +4,11 @@
 2. Your want to get the real IP address of client, but not the cloudflare's server ips
 3. By configuring your nginx.conf, you can use `real_ip_header CF-Connecting-IP; ` to solve this.
 
-# Main procedure.
+# What's the difference from Mamadou Babaei's original version
+
+The orginal script did not verify the file download from cloudflare `https://www.cloudflare.com/ips-v4` and `https://www.cloudflare.com/ips-v6`. This new script add IPv4 and IPv6 verification logic. It helps to prevent from wrong data when cloudflare official web site or your nginx server itself has any problem.
+
+# Main procedure
 
 ## Create cloudflare ips file path
 
@@ -12,7 +16,7 @@
 sudo mkdir /etc/nginx/cloudflare
 ```
 
-## create cloudflare ips sync script
+## Create cloudflare ips sync script
 
 ```bash
 vi /etc/nginx/cloudflare/cloudflare-ip-ranges-updater.sh
@@ -58,7 +62,7 @@ real_ip_header CF-Connecting-IP;
 ```
 
 
-## change Nginx configuration to include cloudflare ips
+## Change Nginx configuration to include cloudflare ips
 
 edit nginx configuration file `/etc/nginx/nginx.conf`, add contents below to `http{}` block.
 
@@ -104,3 +108,7 @@ tail -f /var/log/nginx/access.log
 
 ```
 
+# Reference
+- [Module ngx_http_realip_module](http://nginx.org/en/docs/http/ngx_http_realip_module.html)
+- [Getting real IP addresses using Nginx and CloudFlare](https://www.babaei.net/blog/getting-real-ip-addresses-using-nginx-and-cloudflare/)
+- [Getting Real IP Addresses Using CloudFlare, Nginx, and Varnish](https://danielmiessler.com/blog/getting-real-ip-addresses-using-cloudflare-nginx-and-varnish/)
