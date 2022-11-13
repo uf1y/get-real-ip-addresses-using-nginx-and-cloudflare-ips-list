@@ -27,6 +27,8 @@
 #  Reference: https://www.babaei.net/blog/getting-real-ip-addresses-using-nginx-and-cloudflare/
 #  Updated By: https://github.com/uf1y/get-real-ip-addresses-using-nginx-and-cloudflare-ips-list
 
+# add `include /etc/nginx/cloudflare/cloudflare-ips;` in your /etc/nginx/nginx.conf http{} block.
+
 CLOUDFLARE_IP_RANGES_FILE_PATH="/etc/nginx/cloudflare/cloudflare-ips"
 
 # Nginx running user
