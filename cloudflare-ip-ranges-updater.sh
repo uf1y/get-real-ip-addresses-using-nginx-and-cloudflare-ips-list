@@ -21,11 +21,15 @@
 #  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
+
+
 #  Original Project : https://gitlab.com/NuLL3rr0r/babaei.net/-/tree/master/2013-03-09-getting-real-ip-addresses-using-nginx-and-cloudflare
 #  Reference: https://www.babaei.net/blog/getting-real-ip-addresses-using-nginx-and-cloudflare/
 #  Updated By: https://github.com/uf1y/get-real-ip-addresses-using-nginx-and-cloudflare-ips-list
 
 CLOUDFLARE_IP_RANGES_FILE_PATH="/etc/nginx/cloudflare/cloudflare-ips"
+
+# Nginx running user
 WWW_GROUP="www-data"
 WWW_USER="www-data"
 
@@ -42,30 +46,34 @@ else
     wget -q $CLOUDFLARE_IPSV4_REMOTE_FILE -O $CLOUDFLARE_IPSV4_LOCAL_FILE --no-check-certificate
     wget -q $CLOUDFLARE_IPSV6_REMOTE_FILE -O $CLOUDFLARE_IPSV6_LOCAL_FILE --no-check-certificate
 fi
+
 IPV4_SUCCEED=0
 IPV6_SUCCEED=0
 
+# Verify IPv4 address in file content
 grep "^[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+/[0-9]\+$" $CLOUDFLARE_IPSV4_LOCAL_FILE
 if [ 0 -eq $? ]; then
     IPV4_SUCCEED=1
 fi
-
+# Verify IPv6 address in file content
 grep "^[a-f0-9]\+:[0-9a-f:]\+/[0-9]\+" $CLOUDFLARE_IPSV6_LOCAL_FILE
 if [ 0 -eq $? ]; then
     IPV6_SUCCEED=1
 fi
 
+# Create new cloudflare-ips file
 if [ 1 -eq $IPV4_SUCCEED ] ||  [ 1 -eq $IPV6_SUCCEED ]; then
     echo "# CloudFlare IP Ranges" > $CLOUDFLARE_IP_RANGES_FILE_PATH
     echo "# Generated at $(date) by $0" >> $CLOUDFLARE_IP_RANGES_FILE_PATH
 fi
 
-
+# Add IPv4 ips to cloudflare-ips file
 if [ 1 -eq $IPV4_SUCCEED ]; then
     echo "" >> $CLOUDFLARE_IP_RANGES_FILE_PATH
     awk '{ print "set_real_ip_from " $0 ";" }' $CLOUDFLARE_IPSV4_LOCAL_FILE >> $CLOUDFLARE_IP_RANGES_FILE_PATH
 fi
 
+# Add IPv6 ips to cloudflare-ips file
 if [ 1 -eq $IPV6_SUCCEED ]; then
     echo "" >> $CLOUDFLARE_IP_RANGES_FILE_PATH
     awk '{ print "set_real_ip_from " $0 ";" }' $CLOUDFLARE_IPSV6_LOCAL_FILE >> $CLOUDFLARE_IP_RANGES_FILE_PATH
